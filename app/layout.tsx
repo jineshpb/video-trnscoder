@@ -2,6 +2,8 @@ import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { Toaster } from "@/components/ui/toaster"
+import { PackageX } from 'lucide-react'
+import Image from 'next/image'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -20,7 +22,12 @@ export default function RootLayout({
       <body className={inter.className}>
         <div className="flex flex-row justify-between items-center p-4">
           <div className="text-2xl font-bold">
-            Brand name
+            <Image
+            src="/logo.svg"
+            width={36}
+            height={36}
+            alt="logo"
+            />
           </div>
           <div className="text-sm text-gray-500">
             User name
