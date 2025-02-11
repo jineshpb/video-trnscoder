@@ -18,6 +18,7 @@ import { Download } from 'lucide-react';
 import { Toggle } from '@/components/ui/toggle';
 import { Checkbox } from '@/components/ui/checkbox';
 import { WhisperXTranscript } from '@/app/components/WhisperXTranscript';
+import { HaikuCard } from '@/app/components/HaikuCard';
 
 export default function Home() {
   const { toast } = useToast();
@@ -334,7 +335,7 @@ export default function Home() {
         {audioUrl && (
           <div className="mt-4 ml-8">
             <div className=" flex flex-col gap-2 border p-4 rounded-xl">
-              <h2 className="text-lg font-bold mb-2">Extracted audio</h2>
+              <h2 className="text-lg font-bold mb-2 ">Extracted audio</h2>
               <div className="flex flex-row gap-2 items-center">
                 <audio controls src={audioUrl} className="w-full" />
                 <Button
@@ -414,9 +415,8 @@ export default function Home() {
                       </Button>
 
                       {haiku && (
-                        <div className="mt-2 p-3 bg-muted rounded-md italic">
-                          <h3 className="font-bold mb-2">Or in three lines:</h3>
-                          {haiku}
+                        <div className="mt-4">
+                          <HaikuCard haiku={haiku} summary={summary} />
                         </div>
                       )}
                     </div>
