@@ -69,3 +69,9 @@
     font-family: 'DM Serif Display', serif;
   }
 }
+
+iconify-icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+}

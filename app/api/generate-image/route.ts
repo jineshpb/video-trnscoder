@@ -5,30 +5,58 @@ const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN,
 });
 
-// The full model identifier including version hash
-const MODEL =
-  'google/imagen-3:2e53c6f439a4e2de8769f9f63f2b0453e3b5b5d6edfb65e5fa0f8ac4a1f7b53b';
+const MODEL = 'black-forest-labs/flux-schnell';
 
 export async function POST(req: Request) {
   try {
     const { haiku, summary } = await req.json();
 
-    // Create a prompt that combines the haiku and summary context
-    const prompt = `Create a dreamy, artistic background image that captures the essence of this haiku: "${haiku}". Context from summary: "${summary}". Style: ethereal, minimalistic, suitable as a background.`;
+    if (!haiku || !summary) {
+      return NextResponse.json(
+        { error: 'Haiku and summary are required' },
+        { status: 400 }
+      );
+    }
 
-    // Note the structure of the input object
+    const truncatedSummary = summary.slice(0, 200);
+    const prompt = `Create a dreamy, artistic image: "${haiku}". Context: "${truncatedSummary}". Style: ethereal, minimalistic, high quality photography, no text whatsoever.`;
+
     const output = await replicate.run(MODEL, {
       input: {
         prompt: prompt,
-        num_inference_steps: 50,
-        num_outputs: 1,
-        scheduler: 'DPM++ 2M Karras',
+        aspect_ratio: '1:1',
+        output_format: 'webp',
+        output_quality: 80,
+        safety_tolerance: 2,
+        prompt_upsampling: true,
+        num_inference_steps: 4,
         guidance_scale: 7.5,
       },
     });
 
-    // The API returns an array of image URLs
-    return NextResponse.json({ imageUrl: output[0] });
+    // Handle ReadableStream
+    const stream = output[0] as any;
+    const reader = stream.getReader();
+    let allChunks = new Uint8Array(0);
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      // Combine chunks properly
+      const newArray = new Uint8Array(allChunks.length + value.length);
+      newArray.set(allChunks);
+      newArray.set(value, allChunks.length);
+      allChunks = newArray;
+    }
+
+    // Convert to base64
+    const base64 = Buffer.from(allChunks).toString('base64');
+    const imageUrl = `data:image/webp;base64,${base64}`;
+
+    // console.log('Image URL:', imageUrl);
+
+    return NextResponse.json({ imageUrl });
   } catch (error: any) {
     console.error('Image generation error:', error);
     return NextResponse.json(

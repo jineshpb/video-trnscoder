@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/accordion';
 import { useToast } from '@/hooks/use-toast';
 import { Toast } from '@/components/ui/toast';
-import { Download } from 'lucide-react';
+import { Download, Copy } from 'lucide-react';
 import { Toggle } from '@/components/ui/toggle';
 import { Checkbox } from '@/components/ui/checkbox';
 import { WhisperXTranscript } from '@/app/components/WhisperXTranscript';
@@ -103,6 +103,7 @@ export default function Home() {
       setTranscription('');
       setSummary('');
       setVideoFile(null);
+      setHaiku('');
 
       // Set new video file and display
       setVideoFile(file);
@@ -296,6 +297,14 @@ export default function Home() {
     }
   };
 
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      title: 'Copied!',
+      description: 'Text copied to clipboard',
+    });
+  };
+
   return loaded ? (
     <div className="flex flex-row h-full max-w-screen-2xl mx-auto px-6">
       <div className="w-full flex flex-col h-full gap-4 mt-4 ">
@@ -398,9 +407,18 @@ export default function Home() {
                 )}
                 {summary && (
                   <div>
-                    <div className=" p-3  rounded-xl bg-gray-100">
-                      <h4 className="font-bold mb-2">Summary:</h4>
-                      <p className="prose ">{summary}</p>
+                    <div className="p-3 rounded-xl bg-gray-100">
+                      <div className="flex items-start justify-between gap-2">
+                        <h4 className="font-bold mb-2">Summary:</h4>
+                        <button
+                          onClick={() => copyToClipboard(summary)}
+                          className="p-1.5 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100"
+                          title="Copy summary"
+                        >
+                          <Copy size={16} />
+                        </button>
+                      </div>
+                      <p className="prose">{summary}</p>
                     </div>
                     <div className="mt-4">
                       <Button
@@ -415,7 +433,7 @@ export default function Home() {
                       </Button>
 
                       {haiku && (
-                        <div className="mt-4">
+                        <div className="mt-4 h-auto">
                           <HaikuCard haiku={haiku} summary={summary} />
                         </div>
                       )}
@@ -427,21 +445,37 @@ export default function Home() {
                   <AccordionItem value="transcription">
                     <AccordionTrigger>View Full Transcription</AccordionTrigger>
                     <AccordionContent>
-                      {isWhisperX && Array.isArray(transcription) ? (
-                        <WhisperXTranscript
-                          segments={transcription.map((segment: any) => ({
-                            start: segment.start,
-                            end: segment.end,
-                            text: segment.text,
-                            // Add speaker if available
-                            ...(segment.speaker && {
-                              speaker: segment.speaker,
-                            }),
-                          }))}
-                        />
-                      ) : (
-                        <p className="prose mt-2">{transcription}</p>
-                      )}
+                      <div className="flex items-start justify-between gap-2">
+                        {isWhisperX && Array.isArray(transcription) ? (
+                          <WhisperXTranscript
+                            segments={transcription.map((segment: any) => ({
+                              start: segment.start,
+                              end: segment.end,
+                              text: segment.text,
+                              ...(segment.speaker && {
+                                speaker: segment.speaker,
+                              }),
+                            }))}
+                          />
+                        ) : (
+                          <p className="prose mt-2">{transcription}</p>
+                        )}
+                        <button
+                          onClick={() =>
+                            copyToClipboard(
+                              isWhisperX && Array.isArray(transcription)
+                                ? transcription
+                                    .map((segment: any) => segment.text)
+                                    .join(' ')
+                                : String(transcription)
+                            )
+                          }
+                          className="p-1.5 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100"
+                          title="Copy transcription"
+                        >
+                          <Copy size={16} />
+                        </button>
+                      </div>
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>

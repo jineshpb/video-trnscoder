@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { Icon } from '@iconify-icon/react';
 
 interface HaikuCardProps {
   haiku: string;
@@ -29,6 +30,8 @@ export function HaikuCard({ haiku, summary }: HaikuCardProps) {
         const data = await response.json();
         if (!response.ok) throw new Error(data.error);
 
+        console.log('data', data);
+
         setHaikuBackground(data.imageUrl);
       } catch (error) {
         console.error('Failed to generate image:', error);
@@ -45,18 +48,26 @@ export function HaikuCard({ haiku, summary }: HaikuCardProps) {
   }, [haiku, summary]);
 
   return (
-    <div className="mt-2 p-3 rounded-md overflow-hidden relative min-h-[200px] group">
+    <div className="mt-2  rounded-md overflow-hidden relative min-h-[200px] group ">
       <div
         className="absolute inset-0 w-full h-full transition-transform duration-300 group-hover:scale-105"
         style={{
-          background: haikuBackground?.startsWith('http')
-            ? `url(${haikuBackground}) center/cover no-repeat`
-            : haikuBackground || 'linear-gradient(to right, #ec4899, #8b5cf6)',
+          background:
+            haikuBackground && typeof haikuBackground === 'string'
+              ? haikuBackground.startsWith('data:image')
+                ? `url("${haikuBackground}") center/cover no-repeat`
+                : haikuBackground // for gradient
+              : 'linear-gradient(to right, #4a90e2, #87ceeb)', // default gradient
         }}
       />
-      <div className="relative z-10 p-6 text-white bg-black/30 rounded-md backdrop-blur-sm">
-        <h3 className="font-bold mb-4 text-xl">Haiku Interpretation</h3>
-        <p className="whitespace-pre-line font-serif text-lg italic">{haiku}</p>
+      <div className="relative flex flex-col items-center justify-center gap-6 z-10 backdrop-blur-sm  px-6 py-16 text-white rounded-md ">
+        <div className="flex flex-col items-center py-12 justify-center gap-6">
+          <p className="whitespace-pre-line  font-dm-serif-display text-center text-4xl italic">
+            {haiku}
+          </p>
+        </div>
+        <Icon icon="ph:bird-light" width="32" height="32" />
+
         {isGeneratingImage && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/20">
             <p className="text-white">Generating artwork...</p>
