@@ -1,5 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap');
 
+/* Local Font Import */
+@font-face {
+  font-family: 'PPEditorialNew-UltraLight';
+  src:
+    url('/fonts/ppeditorialnew-ultralight-webfont.woff2') format('woff2'),
+    url('/fonts/ppeditorialnew-ultralight-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -67,6 +78,9 @@
   }
   .font-dm-serif-display {
     font-family: 'DM Serif Display', serif;
+  }
+  .font-ppeditorialnew-ultralight {
+    font-family: 'PPEditorialNew-UltraLight', serif;
   }
 }
 

@@ -19,7 +19,7 @@ import { Toggle } from '@/components/ui/toggle';
 import { Checkbox } from '@/components/ui/checkbox';
 import { WhisperXTranscript } from '@/app/components/WhisperXTranscript';
 import { HaikuCard } from '@/app/components/HaikuCard';
-
+import Image from 'next/image';
 export default function Home() {
   const { toast } = useToast();
   const [loaded, setLoaded] = useState(false);
@@ -306,7 +306,7 @@ export default function Home() {
   };
 
   return loaded ? (
-    <div className="flex flex-row h-full max-w-screen-2xl mx-auto px-6">
+    <div className="flex mt-24 flex-row h-full max-w-screen-2xl mx-auto px-6">
       <div className="w-full flex flex-col h-full gap-4 mt-4 ">
         {!videoFile && (
           <p className="text-sm text-gray-500">Choose a video to transcribe</p>
@@ -486,25 +486,48 @@ export default function Home() {
       </div>
     </div>
   ) : (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <Button onClick={load} variant="default">
-        Load ffmpeg-core
-        {isLoading && (
-          <span className="animate-spin ml-3">
-            <svg
-              viewBox="0 0 1024 1024"
-              focusable="false"
-              data-icon="loading"
-              width="1em"
-              height="1em"
-              fill="currentColor"
-              aria-hidden="true"
-            >
-              <path d="M988 548c-19.9 0-36-16.1-36-36 0-59.4-11.6-117-34.6-171.3a440.45 440.45 0 00-94.3-139.9 437.71 437.71 0 00-139.9-94.3C629 83.6 571.4 72 512 72c-19.9 0-36-16.1-36-36s16.1-36 36-36c69.1 0 136.2 13.5 199.3 40.3C772.3 66 827 103 874 150c47 47 83.9 101.8 109.7 162.7 26.7 63.1 40.2 130.2 40.2 199.3.1 19.9-16 36-35.9 36z"></path>
-            </svg>
+    <div className=" items-center flex flex-col justify-center h-screen">
+      <div className="absolute inset-0 -z-10">
+        <Image
+          src="/background.jpg"
+          alt="logo"
+          width={5000}
+          height={3000}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white from-0% via-30% to-70%" />
+      </div>
+      <div className="flex flex-col items-center justify-center my-auto h-full">
+        <h1 className="text-4xl font-bold">
+          <span className="font-ppeditorialnew-ultralight text-6xl text-slate-500">
+            Video to Haiku
           </span>
-        )}
-      </Button>
+        </h1>
+        <p className="text-gray-400 mt-2 text-sm text-center">
+          A tool that transcribes videos <br /> and generates haikus
+        </p>
+        <button
+          onClick={load}
+          className="mt-4 px-12 py-4 rounded-full bg-[#1ED760] font-bold text-white tracking-widest uppercase transform hover:scale-105 hover:bg-[#21e065] transition-colors duration-200"
+        >
+          Upload a video
+          {isLoading && (
+            <span className="animate-spin ml-3">
+              <svg
+                viewBox="0 0 1024 1024"
+                focusable="false"
+                data-icon="loading"
+                width="1em"
+                height="1em"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path d="M988 548c-19.9 0-36-16.1-36-36 0-59.4-11.6-117-34.6-171.3a440.45 440.45 0 00-94.3-139.9 437.71 437.71 0 00-139.9-94.3C629 83.6 571.4 72 512 72c-19.9 0-36-16.1-36-36s16.1-36 36-36c69.1 0 136.2 13.5 199.3 40.3C772.3 66 827 103 874 150c47 47 83.9 101.8 109.7 162.7 26.7 63.1 40.2 130.2 40.2 199.3.1 19.9-16 36-35.9 36z"></path>
+              </svg>
+            </span>
+          )}
+        </button>
+      </div>
     </div>
   );
 }

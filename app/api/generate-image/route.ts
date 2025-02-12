@@ -34,8 +34,7 @@ export async function POST(req: Request) {
       },
     });
 
-    // Handle ReadableStream
-    const stream = output[0] as any;
+    const stream = output[0];
     const reader = stream.getReader();
     let allChunks = new Uint8Array(0);
 
