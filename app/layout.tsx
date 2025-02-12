@@ -20,11 +20,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className="flex absolute top-0 left-0 right-0 flex-row justify-between items-center p-4">
-          <div className="text-2xl font-bold">
+        <div className="flex absolute top-0 left-0 w-full flex-row justify-between items-center p-4">
+          <div className="text-2xl  flex flex-row items-center gap-2">
             <Image src="/logo.svg" width={36} height={36} alt="logo" />
+            <p className="text-sm font-medium text-gray-500">Video to Haiku</p>
           </div>
-          <div className="text-sm text-gray-500">User name</div>
+          <div className="text-sm text-gray-500">
+            <Image src="/avatar.png" width={36} height={36} alt="avatar" />
+          </div>
         </div>
         {children}
         <Toaster />

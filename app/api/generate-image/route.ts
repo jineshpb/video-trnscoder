@@ -33,6 +33,10 @@ export async function POST(req: Request) {
         guidance_scale: 7.5,
       },
     });
+    // Handle ReadableStream
+    if (!output || !Array.isArray(output) || !output[0]) {
+      throw new Error('Invalid output from Replicate API');
+    }
 
     const stream = output[0];
     const reader = stream.getReader();

@@ -306,17 +306,20 @@ export default function Home() {
   };
 
   return loaded ? (
-    <div className="flex mt-24 flex-row h-full max-w-screen-2xl mx-auto px-6">
+    <div className="flex flex-row h-full mt-32 max-w-screen-2xl mx-auto px-6">
       <div className="w-full flex flex-col h-full gap-4 mt-4 ">
         {!videoFile && (
           <p className="text-sm text-gray-500">Choose a video to transcribe</p>
         )}
 
-        <video
-          ref={videoRef}
-          controls
-          className={`${videoFile ? ' w-full rounded-xl overflow-hidden' : 'hidden'}`}
-        ></video>
+        <div>
+          <video
+            ref={videoRef}
+            controls
+            className={`${videoFile ? ' w-full rounded-xl overflow-hidden' : 'hidden'}`}
+          ></video>
+          <h2 className="text-lg mt-2 font-bold mb-2">{videoFile?.name}</h2>
+        </div>
 
         <Input
           type="file"
@@ -421,16 +424,18 @@ export default function Home() {
                       <p className="prose">{summary}</p>
                     </div>
                     <div className="mt-4">
-                      <Button
-                        onClick={generateHaiku}
-                        disabled={isGeneratingHaiku}
-                        variant="outline"
-                        className="w-auto"
-                      >
-                        {isGeneratingHaiku
-                          ? 'Generating Haiku...'
-                          : '✨ Generate Haiku'}
-                      </Button>
+                      {!haiku && (
+                        <Button
+                          onClick={generateHaiku}
+                          disabled={isGeneratingHaiku}
+                          variant="outline"
+                          className="w-auto"
+                        >
+                          {isGeneratingHaiku
+                            ? 'Generating Haiku...'
+                            : '✨ Generate Haiku'}
+                        </Button>
+                      )}
 
                       {haiku && (
                         <div className="mt-4 h-auto">
