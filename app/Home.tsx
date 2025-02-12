@@ -117,7 +117,7 @@ export default function Home() {
 
   if (!loaded) {
     return (
-      <div className="items-center flex flex-col justify-center h-screen">
+      <div className="items-center flex flex-col md:flex-row justify-center h-screen">
         <div className="absolute inset-0 -z-10">
           <Image
             src="/background.jpg"
@@ -139,7 +139,7 @@ export default function Home() {
           </p>
           <button
             onClick={load}
-            className="mt-4 px-12 py-4 rounded-full bg-[#1ED760] font-bold text-white tracking-widest uppercase transform hover:scale-105 hover:bg-[#21e065] transition-colors duration-200"
+            className="mt-4 flex px-12 py-4 rounded-full bg-[#1ED760] font-bold text-white tracking-widest uppercase transform hover:scale-105 hover:bg-[#21e065] transition-colors duration-200"
           >
             Upload a video
             {isLoading && (
@@ -164,7 +164,7 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-row h-full mt-32 max-w-screen-2xl mx-auto px-6 gap-4">
+    <div className="flex flex-col md:flex-row h-full mt-32 max-w-screen-2xl mx-auto px-6 gap-4">
       <div className="flex flex-col gap-4 w-full">
         <VideoPlayer
           file={videoFile}

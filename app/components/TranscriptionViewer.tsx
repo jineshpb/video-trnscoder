@@ -62,18 +62,14 @@ export function TranscriptionViewer({
           </div>
 
           <div className="mt-4">
-            {!haiku && (
-              <Button
-                onClick={onGenerateHaiku}
-                disabled={isGeneratingHaiku}
-                variant="outline"
-                className="w-auto"
-              >
-                {isGeneratingHaiku
-                  ? 'Generating Haiku...'
-                  : '✨ Generate Haiku'}
-              </Button>
-            )}
+            <Button
+              onClick={onGenerateHaiku}
+              disabled={isGeneratingHaiku}
+              variant="outline"
+              className="w-auto"
+            >
+              {isGeneratingHaiku ? 'Generating Haiku...' : '✨ Generate Haiku'}
+            </Button>
 
             {haiku && (
               <div className="mt-4 h-auto">

@@ -22,6 +22,8 @@ export function VideoUploader({ onVideoSelect }: VideoUploaderProps) {
   const downloadYoutubeVideo = async () => {
     try {
       setIsDownloading(true);
+
+      // First get the video URL from youtube-dl
       const response = await fetch('/api/download-youtube', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -31,7 +33,17 @@ export function VideoUploader({ onVideoSelect }: VideoUploaderProps) {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
 
-      const videoResponse = await fetch(data.videoUrl);
+      // Then download the video through our proxy
+      const videoResponse = await fetch('/api/proxy-video', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ videoUrl: data.videoUrl }),
+      });
+
+      if (!videoResponse.ok) {
+        throw new Error('Failed to download video');
+      }
+
       const videoBlob = await videoResponse.blob();
       const file = new File([videoBlob], `${data.title}.mp4`, {
         type: 'video/mp4',
@@ -45,9 +57,10 @@ export function VideoUploader({ onVideoSelect }: VideoUploaderProps) {
         description: 'Video downloaded successfully!',
       });
     } catch (error: any) {
+      console.error('Download error:', error);
       toast({
         title: 'Error',
-        description: error.message,
+        description: error.message || 'Failed to download video',
         variant: 'destructive',
       });
     } finally {
@@ -56,14 +69,7 @@ export function VideoUploader({ onVideoSelect }: VideoUploaderProps) {
   };
 
   return (
-    <div className="flex flex-col gap-4 p-4 border rounded-2xl">
-      <div className="flex flex-col ">
-        <h2 className="text-lg font-bold">Upload Video</h2>
-        <p className="text-sm text-gray-500">
-          Choose a video or enter YouTube URL
-        </p>
-      </div>
-
+    <div className="flex flex-col gap-4">
       <Input
         type="file"
         accept="video/*"

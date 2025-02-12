@@ -12,9 +12,9 @@ export async function POST(request: Request) {
     // Use exec with the created instance
     const subprocess = youtubedl.exec(url, {
       dumpJson: true,
+      format: 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best', // Updated format selection
       noCheckCertificates: true,
       noWarnings: true,
-      preferFreeFormats: true,
       addHeader: ['referer:youtube.com', 'user-agent:googlebot'],
     });
 
@@ -24,11 +24,39 @@ export async function POST(request: Request) {
     const { stdout } = await subprocess;
     const output = JSON.parse(stdout);
 
-    console.log('Video info:', output);
+    console.log('Available formats:', output.formats);
+
+    // Try different format selection strategies
+    let videoFormat = output.formats?.find(
+      (f: any) =>
+        f.ext === 'mp4' &&
+        f.format_note?.includes('HD') &&
+        f.acodec !== 'none' &&
+        f.vcodec !== 'none'
+    );
+
+    // Fallback to any MP4 format with both audio and video
+    if (!videoFormat) {
+      videoFormat = output.formats?.find(
+        (f: any) =>
+          f.ext === 'mp4' && f.acodec !== 'none' && f.vcodec !== 'none'
+      );
+    }
+
+    // Final fallback to any available format
+    if (!videoFormat) {
+      videoFormat = output.formats?.[0];
+    }
+
+    if (!videoFormat) {
+      throw new Error('No suitable video format found');
+    }
+
+    console.log('Selected format:', videoFormat);
 
     return NextResponse.json({
-      videoUrl: output.url || output.webpage_url,
-      title: output.title,
+      videoUrl: videoFormat.url,
+      title: output.title || 'youtube-video',
     });
   } catch (error: any) {
     console.error('Download error:', {

@@ -36,7 +36,6 @@ export function AudioPlayer({ audioUrl }: AudioPlayerProps) {
 
   return (
     <div className="flex flex-col  gap-2 w-full ">
-      <h2 className="text-lg font-bold">Extracted Audio</h2>
       {/* HTML5 Audio Player with controls */}
 
       <div className="flex items-center gap-2 w-full">

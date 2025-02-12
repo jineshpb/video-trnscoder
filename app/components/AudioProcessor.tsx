@@ -79,24 +79,33 @@ export function AudioProcessor({
   if (!videoFile) return null;
 
   return (
-    <div className="flex flex-col items-end gap-4 p-4 border rounded-2xl">
-      {!audioUrl && (
-        <Button
-          onClick={extractAudio}
-          disabled={isProcessing}
-          variant="outline"
-          className="w-auto"
-        >
-          {isProcessing ? 'Extracting Audio...' : 'Extract Audio'}
-        </Button>
-      )}
+    <div className="flex flex-col items-end gap-4 p-4 border  rounded-2xl">
+      <div className="flex items-center justify-between w-full">
+        <h2 className="text-lg font-bold">Audio</h2>
+        {!audioUrl && (
+          <Button
+            onClick={extractAudio}
+            disabled={isProcessing}
+            variant="outline"
+            className="w-auto"
+          >
+            {isProcessing ? 'Extracting Audio...' : 'Extract Audio'}
+          </Button>
+        )}
+      </div>
+
       <AudioPlayer audioUrl={audioUrl} />
-      {!transcription && (
-        <TranscriptionButton
-          audioUrl={audioUrl}
-          isWhisperX={isWhisperX}
-          setTranscription={setTranscription}
-        />
+      {!transcription && audioUrl && (
+        <div className="flex items-center mt-4 justify-between w-full">
+          <>
+            <h2 className="text-lg font-bold">Transcription</h2>
+            <TranscriptionButton
+              audioUrl={audioUrl}
+              isWhisperX={isWhisperX}
+              setTranscription={setTranscription}
+            />
+          </>
+        </div>
       )}
     </div>
   );
