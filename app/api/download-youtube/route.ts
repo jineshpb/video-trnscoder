@@ -1,18 +1,19 @@
 import { NextResponse } from 'next/server';
 import { create } from 'youtube-dl-exec';
 
+const MAX_DURATION_MINUTES = 25;
+const MAX_FILE_SIZE_MB = 100; // Setting a safe limit for video size
+
 export async function POST(request: Request) {
   try {
     const { url } = await request.json();
     console.log('Processing URL:', url);
 
-    // Create youtubedl instance with binary path
     const youtubedl = create('./node_modules/youtube-dl-exec/bin/yt-dlp');
 
-    // Use exec with the created instance
     const subprocess = youtubedl.exec(url, {
       dumpJson: true,
-      format: 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best', // Updated format selection
+      format: 'best[height<=720][ext=mp4]', // Limit to 720p MP4
       noCheckCertificates: true,
       noWarnings: true,
       addHeader: ['referer:youtube.com', 'user-agent:googlebot'],
@@ -20,43 +21,65 @@ export async function POST(request: Request) {
 
     console.log(`Running subprocess as ${subprocess.pid}`);
 
-    // Wait for the process to complete
     const { stdout } = await subprocess;
-    const output = JSON.parse(stdout);
 
-    console.log('Available formats:', output.formats);
+    const cleanedOutput = stdout.trim().split('\n')[0];
+    const output = JSON.parse(cleanedOutput);
 
-    // Try different format selection strategies
-    let videoFormat = output.formats?.find(
-      (f: any) =>
-        f.ext === 'mp4' &&
-        f.format_note?.includes('HD') &&
-        f.acodec !== 'none' &&
-        f.vcodec !== 'none'
-    );
-
-    // Fallback to any MP4 format with both audio and video
-    if (!videoFormat) {
-      videoFormat = output.formats?.find(
-        (f: any) =>
-          f.ext === 'mp4' && f.acodec !== 'none' && f.vcodec !== 'none'
+    // Check video duration
+    const durationInMinutes = (output.duration || 0) / 60;
+    if (durationInMinutes > MAX_DURATION_MINUTES) {
+      throw new Error(
+        `Video is too long. Maximum duration is ${MAX_DURATION_MINUTES} minutes.`
       );
     }
 
-    // Final fallback to any available format
-    if (!videoFormat) {
-      videoFormat = output.formats?.[0];
-    }
+    console.log(
+      'Available formats:',
+      output.formats?.map((f: any) => ({
+        format_id: f.format_id,
+        ext: f.ext,
+        acodec: f.acodec,
+        vcodec: f.vcodec,
+        format_note: f.format_note,
+        filesize: Math.round(f.filesize / (1024 * 1024)) + 'MB',
+      }))
+    );
+
+    // Get the direct video URL from formats with size check
+    const videoFormat = output.formats?.find((f: any) => {
+      const fileSizeMB = f.filesize ? f.filesize / (1024 * 1024) : 0;
+      return (
+        f.ext === 'mp4' &&
+        f.acodec !== 'none' &&
+        f.vcodec !== 'none' &&
+        f.height <= 720 &&
+        (fileSizeMB === 0 || fileSizeMB <= MAX_FILE_SIZE_MB)
+      );
+    });
 
     if (!videoFormat) {
-      throw new Error('No suitable video format found');
+      console.log('No suitable format found within size/quality limits');
+      throw new Error(
+        'No suitable video format found. Please try a shorter video.'
+      );
     }
 
-    console.log('Selected format:', videoFormat);
+    console.log('Selected format:', {
+      format_id: videoFormat.format_id,
+      ext: videoFormat.ext,
+      resolution: videoFormat.resolution,
+      filesize: Math.round(videoFormat.filesize / (1024 * 1024)) + 'MB',
+      duration: Math.round(durationInMinutes * 10) / 10 + ' minutes',
+    });
 
     return NextResponse.json({
       videoUrl: videoFormat.url,
       title: output.title || 'youtube-video',
+      duration: durationInMinutes,
+      filesize: videoFormat.filesize
+        ? Math.round(videoFormat.filesize / (1024 * 1024))
+        : 'unknown',
     });
   } catch (error: any) {
     console.error('Download error:', {
@@ -64,6 +87,7 @@ export async function POST(request: Request) {
       stack: error.stack,
       command: error?.command,
       stderr: error?.stderr,
+      stdout: error?.stdout,
     });
     return NextResponse.json(
       { error: error.message || 'Failed to download video' },

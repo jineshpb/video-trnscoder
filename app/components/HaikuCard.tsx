@@ -5,47 +5,59 @@ import { useToast } from '@/hooks/use-toast';
 import { Icon } from '@iconify-icon/react';
 
 interface HaikuCardProps {
-  haiku: string;
   summary: string;
 }
 
-export function HaikuCard({ haiku, summary }: HaikuCardProps) {
+export function HaikuCard({ summary }: HaikuCardProps) {
   const { toast } = useToast();
   const [haikuBackground, setHaikuBackground] = useState<string | null>(null);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  const [haiku, setHaiku] = useState<string>('');
+  const [isGeneratingHaiku, setIsGeneratingHaiku] = useState(false);
 
   useEffect(() => {
-    const generateBackground = async () => {
+    async function generateContent() {
+      if (!summary || isGeneratingHaiku || haiku) return;
+
       try {
-        setIsGeneratingImage(true);
-        const response = await fetch('/api/generate-image', {
+        // Generate Haiku
+        setIsGeneratingHaiku(true);
+        const haikuResponse = await fetch('/api/generate-haiku', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            haiku,
-            summary,
-          }),
+          body: JSON.stringify({ text: summary }),
         });
 
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error);
+        const haikuData = await haikuResponse.json();
+        if (!haikuResponse.ok) throw new Error(haikuData.error);
+        setHaiku(haikuData.haiku);
 
-        console.log('data', data);
+        // Generate Image
+        setIsGeneratingImage(true);
+        const imageResponse = await fetch('/api/generate-image', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ haiku: haikuData.haiku, summary }),
+        });
 
-        setHaikuBackground(data.imageUrl);
+        const imageData = await imageResponse.json();
+        if (!imageResponse.ok) throw new Error(imageData.error);
+        setHaikuBackground(imageData.imageUrl);
       } catch (error) {
-        console.error('Failed to generate image:', error);
-        // Fallback to gradient
-        setHaikuBackground('linear-gradient(to right, #ec4899, #8b5cf6)');
+        console.error('Generation error:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to generate content',
+          variant: 'destructive',
+        });
       } finally {
+        setIsGeneratingHaiku(false);
         setIsGeneratingImage(false);
       }
-    };
-
-    if (haiku && summary) {
-      generateBackground();
     }
-  }, [haiku, summary]);
+
+    generateContent();
+  }, [summary, haiku, isGeneratingHaiku, toast]);
 
   return (
     <div className="mt-2  rounded-md overflow-hidden relative min-h-[200px] group ">
