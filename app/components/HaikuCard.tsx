@@ -1,48 +1,42 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useToast } from '@/hooks/use-toast';
+import { useState, useEffect, useRef } from 'react';
+import { toast, useToast } from '@/hooks/use-toast';
 import { Icon } from '@iconify-icon/react';
 
 interface HaikuCardProps {
   summary: string;
+  isGeneratingHaiku: boolean;
+  haiku: string;
+  hasStartedHaikuGeneration: boolean;
 }
 
-export function HaikuCard({ summary }: HaikuCardProps) {
+export function HaikuCard({ summary, haiku }: HaikuCardProps) {
   const { toast } = useToast();
   const [haikuBackground, setHaikuBackground] = useState<string | null>(null);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
-  const [haiku, setHaiku] = useState<string>('');
-  const [isGeneratingHaiku, setIsGeneratingHaiku] = useState(false);
 
   useEffect(() => {
-    async function generateContent() {
-      if (!summary || isGeneratingHaiku || haiku) return;
+    let isGeneratingCurrentImage = false;
+
+    async function generateImage() {
+      if (haikuBackground) return; // Just check if haiku exists
 
       try {
-        // Generate Haiku
-        setIsGeneratingHaiku(true);
-        const haikuResponse = await fetch('/api/generate-haiku', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: summary }),
-        });
+        if (!isGeneratingCurrentImage) {
+          isGeneratingCurrentImage = true;
+          setIsGeneratingImage(true);
 
-        const haikuData = await haikuResponse.json();
-        if (!haikuResponse.ok) throw new Error(haikuData.error);
-        setHaiku(haikuData.haiku);
+          const imageResponse = await fetch('/api/generate-image', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ haiku, summary }),
+          });
 
-        // Generate Image
-        setIsGeneratingImage(true);
-        const imageResponse = await fetch('/api/generate-image', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ haiku: haikuData.haiku, summary }),
-        });
-
-        const imageData = await imageResponse.json();
-        if (!imageResponse.ok) throw new Error(imageData.error);
-        setHaikuBackground(imageData.imageUrl);
+          const imageData = await imageResponse.json();
+          if (!imageResponse.ok) throw new Error(imageData.error);
+          setHaikuBackground(imageData.imageUrl);
+        }
       } catch (error) {
         console.error('Generation error:', error);
         toast({
@@ -51,13 +45,13 @@ export function HaikuCard({ summary }: HaikuCardProps) {
           variant: 'destructive',
         });
       } finally {
-        setIsGeneratingHaiku(false);
+        isGeneratingCurrentImage = false;
         setIsGeneratingImage(false);
       }
     }
 
-    generateContent();
-  }, [summary, haiku, isGeneratingHaiku, toast]);
+    generateImage();
+  }, [haiku, summary]); // Only run when haiku changes
 
   return (
     <div className="mt-2  rounded-md overflow-hidden relative min-h-[200px] group ">

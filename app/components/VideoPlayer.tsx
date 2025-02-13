@@ -38,7 +38,6 @@ export function VideoPlayer({ file, onVideoRef }: VideoPlayerProps) {
         controls
         className={`${file ? 'w-full rounded-xl overflow-hidden' : 'hidden'}`}
       />
-      {file && <h2 className="text-lg mt-2 font-bold mb-2">{file.name}</h2>}
     </div>
   );
 }

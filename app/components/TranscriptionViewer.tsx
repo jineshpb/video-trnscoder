@@ -7,18 +7,18 @@ import {
 } from '@/components/ui/accordion';
 import { WhisperXTranscript } from './WhisperXTranscript';
 import { Copy } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { toast, useToast } from '@/hooks/use-toast';
 import { HaikuCard } from './HaikuCard';
+import { useRef, useState } from 'react';
 
 interface TranscriptionViewerProps {
   transcription: string | Array<any>;
   summary: string;
   isWhisperX: boolean;
   onGenerateSummary: () => Promise<void>;
-  onGenerateHaiku: () => Promise<void>;
   isSummarizing: boolean;
-  isGeneratingHaiku: boolean;
   haiku: string;
+  setHaiku: (haiku: string) => void;
 }
 
 export function TranscriptionViewer({
@@ -26,12 +26,45 @@ export function TranscriptionViewer({
   summary,
   isWhisperX,
   onGenerateSummary,
-  onGenerateHaiku,
   isSummarizing,
-  isGeneratingHaiku,
   haiku,
+  setHaiku,
 }: TranscriptionViewerProps) {
   const { toast } = useToast();
+
+  const hasStartedHaikuGeneration = useRef(false);
+  const [isGeneratingHaiku, setIsGeneratingHaiku] = useState(false);
+
+  const generateHaiku = async (summary: string) => {
+    if (!summary || isGeneratingHaiku || hasStartedHaikuGeneration.current)
+      return;
+
+    hasStartedHaikuGeneration.current = true;
+
+    try {
+      // Generate Haiku
+      setIsGeneratingHaiku(true);
+      const haikuResponse = await fetch('/api/generate-haiku', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: summary }),
+      });
+
+      const haikuData = await haikuResponse.json();
+      if (!haikuResponse.ok) throw new Error(haikuData.error);
+      setHaiku(haikuData.haiku);
+    } catch (error) {
+      console.error('Generation error:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to generate content',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsGeneratingHaiku(false);
+      hasStartedHaikuGeneration.current = false;
+    }
+  };
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -63,7 +96,7 @@ export function TranscriptionViewer({
 
           <div className="mt-4">
             <Button
-              onClick={onGenerateHaiku}
+              onClick={() => generateHaiku(summary)}
               disabled={isGeneratingHaiku}
               variant="outline"
               className="w-auto"
@@ -73,7 +106,12 @@ export function TranscriptionViewer({
 
             {haiku && (
               <div className="mt-4 h-auto">
-                <HaikuCard haiku={haiku} summary={summary} />
+                <HaikuCard
+                  summary={summary}
+                  isGeneratingHaiku={isGeneratingHaiku}
+                  haiku={haiku}
+                  hasStartedHaikuGeneration={hasStartedHaikuGeneration.current}
+                />
               </div>
             )}
           </div>

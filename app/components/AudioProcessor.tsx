@@ -4,6 +4,8 @@ import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 import { AudioPlayer } from './AudioPlayer';
 import { TranscriptionButton } from './TranscriptionButton';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 
 interface AudioProcessorProps {
   videoFile: File | null;
@@ -21,11 +23,11 @@ export function AudioProcessor({
   onAudioExtracted,
   setTranscription,
   audioUrl,
-  isWhisperX,
   transcription,
 }: AudioProcessorProps) {
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isWhisperX, setIsWhisperX] = useState(false);
 
   const extractAudio = async () => {
     if (!videoFile || !ffmpegRef.current) return;
@@ -81,7 +83,13 @@ export function AudioProcessor({
   return (
     <div className="flex flex-col items-end gap-4 p-4 border  rounded-2xl">
       <div className="flex items-center justify-between w-full">
-        <h2 className="text-lg font-bold">Audio</h2>
+        <div>
+          <h2 className="text-lg font-bold">Audio</h2>
+          <p className="text-sm text-gray-400">
+            Extracted audio from your video.
+          </p>
+        </div>
+
         {!audioUrl && (
           <Button
             onClick={extractAudio}
@@ -96,15 +104,28 @@ export function AudioProcessor({
 
       <AudioPlayer audioUrl={audioUrl} />
       {!transcription && audioUrl && (
-        <div className="flex items-center mt-4 justify-between w-full">
-          <>
+        <div className="flex flex-col  w-full">
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="whisperx"
+              checked={isWhisperX}
+              onCheckedChange={(checked) => setIsWhisperX(checked as boolean)}
+            />
+            <Label
+              htmlFor="whisperx"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Use WhisperX for transcription (with timestamps) and slower
+            </Label>
+          </div>
+          <div className="flex items-center justify-between gap-2 mt-4`">
             <h2 className="text-lg font-bold">Transcription</h2>
             <TranscriptionButton
               audioUrl={audioUrl}
               isWhisperX={isWhisperX}
               setTranscription={setTranscription}
             />
-          </>
+          </div>
         </div>
       )}
     </div>

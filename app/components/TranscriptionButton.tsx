@@ -1,4 +1,6 @@
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 
@@ -10,8 +12,8 @@ interface TranscriptionButtonProps {
 
 export function TranscriptionButton({
   audioUrl,
-  isWhisperX,
   setTranscription,
+  isWhisperX,
 }: TranscriptionButtonProps) {
   const [isTranscribing, setIsTranscribing] = useState(false);
   const { toast } = useToast();
@@ -31,13 +33,14 @@ export function TranscriptionButton({
       const formData = new FormData();
       formData.append('audio', audioBlob, 'audio.mp3');
 
-      const response = await fetch(
-        isWhisperX ? '/api/transcribe-whisperx' : '/api/transcribe',
-        {
-          method: 'POST',
-          body: formData,
-        }
-      );
+      // Call the appropriate API endpoint
+      const endpoint = isWhisperX
+        ? '/api/transcribe-whisperx'
+        : '/api/transcribe';
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        body: formData,
+      });
 
       const data = await response.json();
 
@@ -45,9 +48,7 @@ export function TranscriptionButton({
         throw new Error(data.error || 'Failed to transcribe audio');
       }
 
-      console.log('@@data', data);
-
-      // Handle different response formats
+      // Handle different response formats based on the API used
       const text = isWhisperX ? data.segments : data.text;
       setTranscription(text);
 
@@ -55,8 +56,6 @@ export function TranscriptionButton({
         title: 'Success',
         description: 'Transcription complete!',
       });
-
-      console.log('@@text', text);
     } catch (error: any) {
       console.error('Transcription error:', error);
       toast({
@@ -70,13 +69,15 @@ export function TranscriptionButton({
   };
 
   return (
-    <Button
-      onClick={transcribeAudio}
-      disabled={!audioUrl || isTranscribing}
-      variant="outline"
-      className="w-auto"
-    >
-      {isTranscribing ? 'Transcribing...' : 'Transcribe Audio'}
-    </Button>
+    <div className="flex items-center gap-2">
+      <Button
+        onClick={transcribeAudio}
+        disabled={!audioUrl || isTranscribing}
+        variant="outline"
+        className="w-auto"
+      >
+        {isTranscribing ? 'Transcribing...' : 'Transcribe Audio'}
+      </Button>
+    </div>
   );
 }

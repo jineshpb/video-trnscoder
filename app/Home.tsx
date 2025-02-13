@@ -24,7 +24,6 @@ export default function Home() {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [isWhisperX, setIsWhisperX] = useState(true);
   const [haiku, setHaiku] = useState<string>('');
-  const [isGeneratingHaiku, setIsGeneratingHaiku] = useState(false);
 
   const load = async () => {
     setIsLoading(true);
@@ -55,7 +54,6 @@ export default function Home() {
     setAudioUrl(null);
     setTranscription('');
     setSummary('');
-    setHaiku('');
     setVideoFile(file);
   };
 
@@ -91,27 +89,6 @@ export default function Home() {
       });
     } finally {
       setIsSummarizing(false);
-    }
-  };
-
-  const generateHaiku = async () => {
-    setIsGeneratingHaiku(true);
-    try {
-      const response = await fetch('/api/generate-haiku', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ summary }),
-      });
-      const data = await response.json();
-      setHaiku(data.haiku);
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to generate haiku',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsGeneratingHaiku(false);
     }
   };
 
@@ -164,40 +141,48 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col md:flex-row h-full mt-32 max-w-screen-2xl mx-auto px-6 gap-4">
-      <div className="flex flex-col gap-4 w-full">
-        <VideoPlayer
-          file={videoFile}
-          onVideoRef={(ref) => (videoRef.current = ref)}
-        />
-        <VideoUploader onVideoSelect={handleVideoSelect} />
-        <AudioProcessor
-          videoFile={videoFile}
-          ffmpegRef={ffmpegRef}
-          onAudioExtracted={handleAudioExtracted}
-          setTranscription={setTranscription}
-          transcription={transcription}
-          audioUrl={audioUrl}
-          isWhisperX={isWhisperX}
-        />
-      </div>
-      <div className="w-full flex flex-col h-full gap-4">
-        {videoFile && (
-          <div className="space-y-4 flex flex-col w-full">
-            <div className="flex flex-col gap-4">
-              <TranscriptionViewer
-                transcription={transcription}
-                summary={summary}
-                isWhisperX={isWhisperX}
-                onGenerateSummary={generateSummary}
-                onGenerateHaiku={generateHaiku}
-                isSummarizing={isSummarizing}
-                isGeneratingHaiku={isGeneratingHaiku}
-                haiku={haiku}
-              />
+    <div className="flex flex-col gap-4 max-w-screen-2xl mx-auto px-6 mt-32">
+      <h1 className="text-5xl font-bold">{videoFile?.name}</h1>
+      <p className="text-gray-400 text-sm prose">
+        This is your video, follow the instructions on the screen to extract
+        audio, generate transcription and summary . Or even better, turn the
+        video into a haiku, save everones time
+      </p>
+
+      <div className="flex flex-col md:flex-row h-full gap-4">
+        <div className="flex flex-col gap-4 w-full">
+          <VideoPlayer
+            file={videoFile}
+            onVideoRef={(ref) => (videoRef.current = ref)}
+          />
+          <VideoUploader onVideoSelect={handleVideoSelect} />
+          <AudioProcessor
+            videoFile={videoFile}
+            ffmpegRef={ffmpegRef}
+            onAudioExtracted={handleAudioExtracted}
+            setTranscription={setTranscription}
+            transcription={transcription}
+            audioUrl={audioUrl}
+            isWhisperX={isWhisperX}
+          />
+        </div>
+        <div className="w-full flex flex-col h-full gap-4">
+          {videoFile && (
+            <div className="space-y-4 flex flex-col w-full">
+              <div className="flex flex-col gap-4">
+                <TranscriptionViewer
+                  transcription={transcription}
+                  summary={summary}
+                  isWhisperX={isWhisperX}
+                  onGenerateSummary={generateSummary}
+                  isSummarizing={isSummarizing}
+                  haiku={haiku}
+                  setHaiku={setHaiku}
+                />
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
