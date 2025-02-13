@@ -118,7 +118,7 @@ export function AudioProcessor({
               Use WhisperX for transcription (with timestamps) and slower
             </Label>
           </div>
-          <div className="flex items-center justify-between gap-2 mt-4`">
+          <div className="flex items-center justify-between gap-2 mt-6">
             <h2 className="text-lg font-bold">Transcription</h2>
             <TranscriptionButton
               audioUrl={audioUrl}

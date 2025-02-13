@@ -95,14 +95,18 @@ export function TranscriptionViewer({
           </div>
 
           <div className="mt-4">
-            <Button
-              onClick={() => generateHaiku(summary)}
-              disabled={isGeneratingHaiku}
-              variant="outline"
-              className="w-auto"
-            >
-              {isGeneratingHaiku ? 'Generating Haiku...' : '✨ Generate Haiku'}
-            </Button>
+            {!haiku && (
+              <Button
+                onClick={() => generateHaiku(summary)}
+                disabled={isGeneratingHaiku}
+                variant="outline"
+                className="w-auto"
+              >
+                {isGeneratingHaiku
+                  ? 'Generating Haiku...'
+                  : '✨ Generate Haiku'}
+              </Button>
+            )}
 
             {haiku && (
               <div className="mt-4 h-auto">
@@ -118,8 +122,8 @@ export function TranscriptionViewer({
         </div>
       )}
 
-      <div className="flex items-center justify-between mt-4">
-        <h2 className="text-lg font-bold">Transcription</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-bold mt-4">Transcription</h2>
         {!summary && (
           <Button
             onClick={onGenerateSummary}

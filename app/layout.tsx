@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { PackageX } from 'lucide-react';
 import Image from 'next/image';
 import Footer from './components/Footer';
+import NavBar from './components/NavBar';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
@@ -20,18 +21,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className="flex absolute top-0 left-0 w-full flex-row justify-between items-center p-4">
-          <div className="text-2xl  flex flex-row items-center gap-2">
-            <Image src="/logo.svg" width={36} height={36} alt="logo" />
-            <p className="text-sm font-medium text-gray-500">Video to Haiku</p>
-          </div>
-          <div className="text-sm text-gray-500">
-            <Image src="/avatar.png" width={36} height={36} alt="avatar" />
-          </div>
+        <div className="min-h-screen flex flex-col">
+          <NavBar />
+          <main className="flex-grow">{children}</main>
+          <Toaster />
+          <Footer />
         </div>
-        {children}
-        <Toaster />
-        <Footer />
       </body>
     </html>
   );

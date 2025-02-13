@@ -78,13 +78,18 @@ export function VideoUploader({ onVideoSelect }: VideoUploaderProps) {
         placeholder="Choose a video to transcribe"
       />
       <div className="flex gap-2">
-        <Input
-          type="url"
-          value={youtubeUrl}
-          onChange={(e) => setYoutubeUrl(e.target.value)}
-          placeholder="Or enter YouTube URL"
-          className="flex-1"
-        />
+        <div className="flex flex-col gap-2 w-full">
+          <Input
+            type="url"
+            value={youtubeUrl}
+            onChange={(e) => setYoutubeUrl(e.target.value)}
+            placeholder="Or enter YouTube URL"
+            className="flex-1"
+          />
+          <p className="text-xs text-gray-500 pl-2">
+            Videos of length less than 25 mins for now please
+          </p>
+        </div>
         <Button
           onClick={downloadYoutubeVideo}
           disabled={!youtubeUrl || isDownloading}
