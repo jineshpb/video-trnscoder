@@ -1,14 +1,15 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB - Whisper's limit
 
 export async function POST(request: Request) {
   try {
+    // Initialize OpenAI here instead of at the top level
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+
     const formData = await request.formData();
     const audioFile = formData.get('audio') as File;
 
@@ -38,7 +39,7 @@ export async function POST(request: Request) {
     try {
       const response = await openai.audio.transcriptions.create({
         file: audioFile,
-        model: "whisper-1",
+        model: 'whisper-1',
       });
 
       return NextResponse.json({ text: response.text });
@@ -58,7 +59,6 @@ export async function POST(request: Request) {
       }
       throw openaiError; // Re-throw for general error handling
     }
-
   } catch (error) {
     console.error('Transcription error:', error);
     return NextResponse.json(
@@ -66,4 +66,4 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
-} 
+}
