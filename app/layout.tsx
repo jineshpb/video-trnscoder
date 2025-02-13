@@ -8,6 +8,9 @@ import Footer from './components/Footer';
 import NavBar from './components/NavBar';
 const inter = Inter({ subsets: ['latin'] });
 
+const baseUrl =
+  process.env.NEXT_PUBLIC_APP_URL || 'https://video-to-haiku.up.railway.app';
+
 export const metadata: Metadata = {
   title: 'Video to Haiku',
   description: 'Transform your videos into beautiful haikus with AI',
@@ -16,7 +19,7 @@ export const metadata: Metadata = {
     description: 'Transform your videos into beautiful haikus with AI',
     images: [
       {
-        url: '/og-image.jpg', // Adjust extension if different
+        url: `${baseUrl}/og-image.jpg`,
         width: 1200,
         height: 630,
         alt: 'Video to Haiku - AI-powered video poetry',
@@ -28,7 +31,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Video to Haiku',
     description: 'Transform your videos into beautiful haikus with AI',
-    images: ['/og-image.png'], // Adjust extension if different
+    images: [`${baseUrl}/og-image.jpg`],
   },
 };
 
