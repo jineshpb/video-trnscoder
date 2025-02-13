@@ -1,7 +1,18 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { useForm } from 'react-hook-form';
 
 interface VideoUploaderProps {
   onVideoSelect: (file: File) => void;
@@ -11,6 +22,8 @@ export function VideoUploader({ onVideoSelect }: VideoUploaderProps) {
   const { toast } = useToast();
   const [youtubeUrl, setYoutubeUrl] = useState('');
   const [isDownloading, setIsDownloading] = useState(false);
+
+  const form = useForm();
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -69,35 +82,38 @@ export function VideoUploader({ onVideoSelect }: VideoUploaderProps) {
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      <Input
-        type="file"
-        accept="video/*"
-        onChange={handleFileUpload}
-        className="w-full cursor-pointer"
-        placeholder="Choose a video to transcribe"
-      />
-      <div className="flex gap-2">
-        <div className="flex flex-col gap-2 w-full">
-          <Input
-            type="url"
-            value={youtubeUrl}
-            onChange={(e) => setYoutubeUrl(e.target.value)}
-            placeholder="Or enter YouTube URL"
-            className="flex-1"
-          />
-          <p className="text-xs text-gray-500 pl-2">
-            Videos of length less than 25 mins for now please
-          </p>
+    <Form {...form}>
+      <div className="flex flex-col gap-4">
+        <Input
+          type="file"
+          accept="video/*"
+          onChange={handleFileUpload}
+          className="w-full cursor-pointer"
+          placeholder="Choose a video to transcribe"
+        />
+        <div className="flex gap-2">
+          <FormItem className="flex-1">
+            <FormControl>
+              <Input
+                type="url"
+                value={youtubeUrl}
+                onChange={(e) => setYoutubeUrl(e.target.value)}
+                placeholder="Or enter YouTube URL"
+              />
+            </FormControl>
+            <FormDescription className="pl-2">
+              Videos of length less than 25 mins for now please
+            </FormDescription>
+          </FormItem>
+          <Button
+            onClick={downloadYoutubeVideo}
+            disabled={!youtubeUrl || isDownloading}
+            variant="outline"
+          >
+            {isDownloading ? 'Downloading...' : 'Download'}
+          </Button>
         </div>
-        <Button
-          onClick={downloadYoutubeVideo}
-          disabled={!youtubeUrl || isDownloading}
-          variant="outline"
-        >
-          {isDownloading ? 'Downloading...' : 'Download'}
-        </Button>
       </div>
-    </div>
+    </Form>
   );
 }

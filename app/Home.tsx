@@ -142,12 +142,18 @@ export default function Home() {
 
   return (
     <div className="flex flex-col gap-4 max-w-screen-2xl mx-auto px-6 mt-32">
-      <h1 className="text-5xl font-bold">{videoFile?.name}</h1>
-      <p className="text-gray-400 text-sm prose">
-        This is your video, follow the instructions on the screen to extract
-        audio, generate transcription and summary . Or even better, turn the
-        video into a haiku, save everones time
-      </p>
+      {videoFile ? (
+        <h1 className="text-5xl font-bold">{videoFile?.name}</h1>
+      ) : (
+        <h1 className="text-5xl font-bold">Upload a video</h1>
+      )}
+      {videoFile && (
+        <p className="text-gray-400 text-sm prose">
+          This is your video, follow the instructions on the screen to extract
+          audio, generate transcription and summary . Or even better, turn the
+          video into a haiku, save everones time
+        </p>
+      )}
 
       <div className="flex flex-col md:flex-row h-full gap-4">
         <div className="flex flex-col gap-4 w-full">

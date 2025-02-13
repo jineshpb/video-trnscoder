@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     }
 
     const truncatedSummary = summary.slice(0, 200);
-    const prompt = `Create a dreamy, artistic image: "${haiku}". Context: "${truncatedSummary}". Style: ethereal, minimalistic, high quality photography, no text whatsoever.`;
+    const prompt = `Create a dreamy, artistic image: "${haiku}". Context: "${truncatedSummary}". Style: ethereal, minimalistic, high quality photography, no TEXT on image whatsoever.`;
 
     const output = await replicate.run(MODEL, {
       input: {
