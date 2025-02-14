@@ -27,10 +27,16 @@ RUN npm install
 # Copy the rest of the application
 COPY . .
 
-# Build the application
+# Build the application with environment variables available
+ARG OPENAI_API_KEY
+ARG REPLICATE_API_TOKEN
+ENV OPENAI_API_KEY=${OPENAI_API_KEY}
+ENV REPLICATE_API_TOKEN=${REPLICATE_API_TOKEN}
 RUN npm run build
 
-# Set environment variables
+# Set runtime environment variables
+ENV OPENAI_API_KEY=${OPENAI_API_KEY}
+ENV REPLICATE_API_TOKEN=${REPLICATE_API_TOKEN}
 ENV NODE_ENV=production
 ENV YOUTUBE_DL_SKIP_PYTHON_CHECK=1
 ENV YTDL_NO_UPDATE=1
