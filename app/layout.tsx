@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Video to Haiku',
     description: 'Transform your videos into beautiful haikus with AI',
-    images: [`${baseUrl}/og-image.jpg`],
+    images: [`${baseUrl}/og-image.png`],
   },
 };
 
