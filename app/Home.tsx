@@ -64,10 +64,20 @@ export default function Home() {
   const generateSummary = async () => {
     setIsSummarizing(true);
     try {
-      // Convert segments array to text if using WhisperX
-      const transcriptionText = isWhisperX
-        ? (transcription as any[]).map((segment) => segment.text).join(' ')
-        : transcription;
+      // Ensure transcription is treated as an array and handle both formats
+      let transcriptionText = '';
+
+      if (Array.isArray(transcription)) {
+        // Handle WhisperX format or normalized Whisper format
+        transcriptionText = transcription
+          .map((segment: any) => segment.text)
+          .join(' ');
+      } else if (typeof transcription === 'string') {
+        // Handle plain string format just in case
+        transcriptionText = transcription;
+      } else {
+        throw new Error('Invalid transcription format');
+      }
 
       const response = await fetch('/api/summarize', {
         method: 'POST',
@@ -82,6 +92,7 @@ export default function Home() {
       const data = await response.json();
       setSummary(data.summary);
     } catch (error: any) {
+      console.error('Summary error:', error);
       toast({
         title: 'Error',
         description: error.message || 'Failed to generate summary',
@@ -151,7 +162,7 @@ export default function Home() {
         <p className="text-gray-400 text-sm prose">
           This is your video, follow the instructions on the screen to extract
           audio, generate transcription and summary . Or even better, turn the
-          video into a haiku, save everones time
+          video into a haiku, save time
         </p>
       )}
 

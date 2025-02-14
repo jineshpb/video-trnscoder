@@ -33,7 +33,6 @@ export function TranscriptionButton({
       const formData = new FormData();
       formData.append('audio', audioBlob, 'audio.mp3');
 
-      // Call the appropriate API endpoint
       const endpoint = isWhisperX
         ? '/api/transcribe-whisperx'
         : '/api/transcribe';
@@ -48,9 +47,11 @@ export function TranscriptionButton({
         throw new Error(data.error || 'Failed to transcribe audio');
       }
 
-      // Handle different response formats based on the API used
-      const text = isWhisperX ? data.segments : data.text;
-      setTranscription(text);
+      // Normalize the response format
+      const transcription = isWhisperX ? data.segments : [{ text: data.text }]; // Wrap regular transcription in array format
+
+      console.log('@@transcription', transcription);
+      setTranscription(transcription);
 
       toast({
         title: 'Success',

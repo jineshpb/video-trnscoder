@@ -102,7 +102,7 @@ export function VideoUploader({ onVideoSelect }: VideoUploaderProps) {
               />
             </FormControl>
             <FormDescription className="pl-2">
-              Videos of length less than 25 mins for now please
+              Please upload videos shorter than 25 minutes
             </FormDescription>
           </FormItem>
           <Button
