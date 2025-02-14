@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description: 'Transform your videos into beautiful haikus with AI',
     images: [
       {
-        url: `${baseUrl}/og-image.jpg`,
+        url: `${baseUrl}/og-image.png`,
         width: 1200,
         height: 630,
         alt: 'Video to Haiku - AI-powered video poetry',

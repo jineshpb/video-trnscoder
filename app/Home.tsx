@@ -162,7 +162,7 @@ export default function Home() {
         <p className="text-gray-400 text-sm prose">
           This is your video, follow the instructions on the screen to extract
           audio, generate transcription and summary . Or even better, turn the
-          video into a haiku, save time
+          video into a haiku, save time.
         </p>
       )}
 
