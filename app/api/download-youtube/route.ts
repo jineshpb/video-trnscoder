@@ -38,21 +38,19 @@ export async function POST(request: Request) {
     const { url } = await request.json();
     console.log('Processing URL:', url);
 
-    // Use global yt-dlp installed by pip3
-    // const youtubedl = create('node_modules/youtube-dl-exec/bin/yt-dlp')
-    const binaryPath = path.resolve(
-      process.cwd(),
-      'node_modules/youtube-dl-exec/bin/yt-dlp'
-    );
+    // Download and setup standalone yt-dlp binary at runtime
+    const binaryPath = path.join(process.cwd(), 'yt-dlp');
 
-    // Make binary executable if it exists
-    if (existsSync(binaryPath)) {
-      try {
-        chmodSync(binaryPath, '755');
-        console.log('Made binary executable:', binaryPath);
-      } catch (error) {
-        console.error('Failed to chmod binary:', error);
-      }
+    if (!existsSync(binaryPath)) {
+      console.log('Downloading standalone yt-dlp...');
+      const response = await fetch(
+        'https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp'
+      );
+      const buffer = await response.arrayBuffer();
+      const fs = require('fs');
+      fs.writeFileSync(binaryPath, Buffer.from(buffer));
+      chmodSync(binaryPath, '755');
+      console.log('Downloaded and made executable');
     }
 
     const youtubedl = create(binaryPath);
