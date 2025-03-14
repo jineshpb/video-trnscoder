@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "postinstall": "pip3 install yt-dlp"
   },
   "dependencies": {
     "@ffmpeg/ffmpeg": "*",
@@ -41,7 +42,7 @@
     "tailwindcss": "3.3.3",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "5.1.6",
-    "youtube-dl-exec": "^3.0.15",
+    "youtube-dl-exec": "^3.0.18",
     "ytdl-core": "^4.11.5",
     "zod": "^3.24.2"
   },

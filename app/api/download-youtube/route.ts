@@ -1,25 +1,57 @@
 import { NextResponse } from 'next/server';
 import { create } from 'youtube-dl-exec';
+import { existsSync } from 'fs';
+import path from 'path';
 
 const MAX_DURATION_MINUTES = 25;
 const MAX_FILE_SIZE_MB = 100; // Setting a safe limit for video size
+
+const possiblePaths = [
+  '/usr/local/bin/yt-dlp', // Global install (Linux/macOS)
+  '/usr/bin/yt-dlp', // Alternative system path
+  './node_modules/youtube-dl-exec/bin/yt-dlp', // Local node_modules
+  'yt-dlp', // Default (if in PATH)
+];
+
+function findYtDlpBinary() {
+  console.log('Environment:', process.env.NODE_ENV);
+  const projectRoot = process.cwd();
+  console.log('Current working directory:', projectRoot);
+
+  // Use absolute path for node_modules
+  const localPath = path.join(
+    projectRoot,
+    'node_modules/youtube-dl-exec/bin/yt-dlp'
+  );
+  console.log('Checking absolute local path:', localPath);
+
+  if (existsSync(localPath)) {
+    console.log(`Using yt-dlp binary at: ${localPath}`);
+    return create(localPath);
+  }
+
+  throw new Error(`yt-dlp binary not found at ${localPath}`);
+}
 
 export async function POST(request: Request) {
   try {
     const { url } = await request.json();
     console.log('Processing URL:', url);
 
-    const youtubedl = create('./node_modules/youtube-dl-exec/bin/yt-dlp');
+    // Use global yt-dlp installed by pip3
+    const youtubedl = create('yt-dlp'); // This will use the globally installed yt-dlp from pip3
+    // const youtubedl = create('node_modules/youtube-dl-exec/bin/yt-dlp'); // for local
 
+    console.log('Starting youtube-dl process...');
     const subprocess = youtubedl.exec(url, {
       dumpJson: true,
-      format: 'best[height<=720][ext=mp4]', // Limit to 720p MP4
+      format: 'best[height<=720][ext=mp4]',
       noCheckCertificates: true,
       noWarnings: true,
       addHeader: ['referer:youtube.com', 'user-agent:googlebot'],
     });
 
-    console.log(`Running subprocess as ${subprocess.pid}`);
+    console.log('Subprocess created, waiting for output...');
 
     const { stdout } = await subprocess;
 
