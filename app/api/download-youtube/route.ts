@@ -39,8 +39,12 @@ export async function POST(request: Request) {
     console.log('Processing URL:', url);
 
     // Use global yt-dlp installed by pip3
-    const youtubedl = create('yt-dlp'); // This will use the globally installed yt-dlp from pip3
-    // const youtubedl = create('node_modules/youtube-dl-exec/bin/yt-dlp'); // for local
+    // const youtubedl = create('node_modules/youtube-dl-exec/bin/yt-dlp')
+    const binaryPath = path.resolve(
+      process.cwd(),
+      'node_modules/youtube-dl-exec/bin/yt-dlp'
+    );
+    const youtubedl = create(binaryPath);
 
     console.log('Starting youtube-dl process...');
     const subprocess = youtubedl.exec(url, {
