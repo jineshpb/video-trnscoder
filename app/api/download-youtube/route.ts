@@ -38,8 +38,24 @@ export async function POST(request: Request) {
     const { url } = await request.json();
     console.log('Processing URL:', url);
 
-    // Instead of path resolution, use the binary directly
-    const youtubedl = create('yt-dlp');
+    // Use global yt-dlp installed by pip3
+    // const youtubedl = create('node_modules/youtube-dl-exec/bin/yt-dlp')
+    const binaryPath = path.resolve(
+      process.cwd(),
+      'node_modules/youtube-dl-exec/bin/yt-dlp'
+    );
+
+    // Make binary executable if it exists
+    if (existsSync(binaryPath)) {
+      try {
+        chmodSync(binaryPath, '755');
+        console.log('Made binary executable:', binaryPath);
+      } catch (error) {
+        console.error('Failed to chmod binary:', error);
+      }
+    }
+
+    const youtubedl = create(binaryPath);
 
     console.log('Starting youtube-dl process...');
     const subprocess = youtubedl.exec(url, {
