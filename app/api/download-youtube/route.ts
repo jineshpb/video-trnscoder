@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { create } from 'youtube-dl-exec';
-import { existsSync } from 'fs';
+import { existsSync, chmodSync } from 'fs';
 import path from 'path';
 
 const MAX_DURATION_MINUTES = 25;
@@ -38,13 +38,8 @@ export async function POST(request: Request) {
     const { url } = await request.json();
     console.log('Processing URL:', url);
 
-    // Use global yt-dlp installed by pip3
-    // const youtubedl = create('node_modules/youtube-dl-exec/bin/yt-dlp')
-    const binaryPath = path.resolve(
-      process.cwd(),
-      'node_modules/youtube-dl-exec/bin/yt-dlp'
-    );
-    const youtubedl = create(binaryPath);
+    // Instead of path resolution, use the binary directly
+    const youtubedl = create('yt-dlp');
 
     console.log('Starting youtube-dl process...');
     const subprocess = youtubedl.exec(url, {
