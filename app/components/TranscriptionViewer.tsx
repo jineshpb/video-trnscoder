@@ -10,6 +10,7 @@ import { Copy } from 'lucide-react';
 import { toast, useToast } from '@/hooks/use-toast';
 import { HaikuCard } from './HaikuCard';
 import { useRef, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 
 interface TranscriptionViewerProps {
   transcription: string | Array<any>;
@@ -91,7 +92,9 @@ export function TranscriptionViewer({
                 <Copy size={16} />
               </button>
             </div>
-            <p className="prose">{summary}</p>
+            <div className="prose">
+              <ReactMarkdown>{summary}</ReactMarkdown>
+            </div>
           </div>
 
           <div className="mt-4">
@@ -151,7 +154,13 @@ export function TranscriptionViewer({
                   }))}
                 />
               ) : (
-                <p className="prose mt-2">{transcription}</p>
+                <div className="prose mt-2">
+                  <ReactMarkdown>
+                    {Array.isArray(transcription)
+                      ? transcription.map((s) => s.text).join(' ')
+                      : transcription}
+                  </ReactMarkdown>
+                </div>
               )}
               <button
                 onClick={() =>

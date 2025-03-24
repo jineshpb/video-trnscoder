@@ -22,7 +22,7 @@ export default function Home() {
   const [summary, setSummary] = useState<string>('');
   const [isSummarizing, setIsSummarizing] = useState(false);
   const [videoFile, setVideoFile] = useState<File | null>(null);
-  const [isWhisperX, setIsWhisperX] = useState(true);
+  const [isWhisperX, setIsWhisperX] = useState(false);
   const [haiku, setHaiku] = useState<string>('');
 
   const load = async () => {

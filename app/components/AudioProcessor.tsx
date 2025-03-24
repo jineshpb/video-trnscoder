@@ -109,7 +109,10 @@ export function AudioProcessor({
             <Checkbox
               id="whisperx"
               checked={isWhisperX}
-              onCheckedChange={(checked) => setIsWhisperX(checked as boolean)}
+              onCheckedChange={(checked) => {
+                // console.log('@@CHECK', checked);
+                setIsWhisperX(!!checked);
+              }}
             />
             <Label
               htmlFor="whisperx"

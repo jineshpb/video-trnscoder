@@ -32,7 +32,7 @@ export async function POST(request: Request) {
         {
           role: 'system',
           content:
-            'You are a helpful assistant that summarizes conversations between two or more people. Add bullet points if required, do not miss any important points.',
+            'You are a helpful assistant that analyzes and summarizes video transcriptions. First, identify the type of video by checking for timestamps in the transcription. If it is a meeting transcript, identify and highlight the intent of the meeting and point out important pointers using bullet points. If it is not a meeting transcript, provide a concise summary of the content. Ensure no important details are missed.',
         },
         {
           role: 'user',
