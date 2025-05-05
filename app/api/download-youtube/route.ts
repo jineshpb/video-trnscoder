@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { create } from 'youtube-dl-exec';
-import { existsSync, chmodSync } from 'fs';
+import { existsSync, chmodSync, writeFileSync } from 'fs';
 import path from 'path';
 
 const MAX_DURATION_MINUTES = 25;
@@ -38,24 +38,9 @@ export async function POST(request: Request) {
     const { url } = await request.json();
     console.log('Processing URL:', url);
 
-    // Download and setup standalone yt-dlp binary at runtime
-    const binaryPath = path.join(process.cwd(), 'yt-dlp');
+    // Use the robust binary finder
+    const youtubedl = findYtDlpBinary();
 
-    if (!existsSync(binaryPath)) {
-      console.log('Downloading standalone yt-dlp...');
-      const response = await fetch(
-        'https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp'
-      );
-      const buffer = await response.arrayBuffer();
-      const fs = require('fs');
-      fs.writeFileSync(binaryPath, Buffer.from(buffer));
-      chmodSync(binaryPath, '755');
-      console.log('Downloaded and made executable');
-    }
-
-    const youtubedl = create(binaryPath);
-
-    console.log('Starting youtube-dl process...');
     const subprocess = youtubedl.exec(url, {
       dumpJson: true,
       format: 'best[height<=720][ext=mp4]',
@@ -64,10 +49,7 @@ export async function POST(request: Request) {
       addHeader: ['referer:youtube.com', 'user-agent:googlebot'],
     });
 
-    console.log('Subprocess created, waiting for output...');
-
     const { stdout } = await subprocess;
-
     const cleanedOutput = stdout.trim().split('\n')[0];
     const output = JSON.parse(cleanedOutput);
 
