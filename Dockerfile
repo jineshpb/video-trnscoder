@@ -14,8 +14,6 @@ RUN apt-get update && apt-get install -y \
 RUN wget https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -O /usr/local/bin/yt-dlp \
     && chmod a+rx /usr/local/bin/yt-dlp
 
-# Optional: install sharp for image optimization
-RUN npm install sharp
 
 # Set Python alias
 RUN ln -s /usr/bin/python3 /usr/bin/python
