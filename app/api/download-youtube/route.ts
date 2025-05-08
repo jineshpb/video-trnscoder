@@ -14,23 +14,28 @@ const possiblePaths = [
 ];
 
 function findYtDlpBinary() {
-  console.log('Environment:', process.env.NODE_ENV);
   const projectRoot = process.cwd();
-  console.log('Current working directory:', projectRoot);
 
-  // Use absolute path for node_modules
-  const localPath = path.join(
+  // Check local dev path first (e.g., for local testing)
+  const localNodePath = path.join(
     projectRoot,
     'node_modules/youtube-dl-exec/bin/yt-dlp'
   );
-  console.log('Checking absolute local path:', localPath);
-
-  if (existsSync(localPath)) {
-    console.log(`Using yt-dlp binary at: ${localPath}`);
-    return create(localPath);
+  if (process.env.NODE_ENV !== 'production' && existsSync(localNodePath)) {
+    console.log(`Using local yt-dlp binary: ${localNodePath}`);
+    return create(localNodePath);
   }
 
-  throw new Error(`yt-dlp binary not found at ${localPath}`);
+  // In production, use globally installed binary (Docker image has it at /usr/local/bin)
+  const globalPath = '/usr/local/bin/yt-dlp';
+  if (existsSync(globalPath)) {
+    console.log(`Using global yt-dlp binary: ${globalPath}`);
+    return create(globalPath);
+  }
+
+  // Fallback to path-based discovery
+  console.log('Falling back to PATH-based yt-dlp resolution');
+  return create('yt-dlp');
 }
 
 export async function POST(request: Request) {
